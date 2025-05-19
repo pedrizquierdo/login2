@@ -1,3 +1,5 @@
+from gui.admin_view import AdminView
+from gui.collaborator_view import CollaboratorView
 from tkinter import Frame, Tk, Label, Entry, Button, StringVar, messagebox
 from persistence.user_repository import get_user_by_username
 from utils.password_utils import verify_password
@@ -20,25 +22,20 @@ class LoginWindow(Frame):
         Entry(master, textvariable=self.password_var, show='*').pack()
 
         Button(master, text="Login", command=self.login).pack(pady=20)
+        Button(master, text="Salir", command=self.master.quit).pack(pady=5)  # Botón para cerrar la app
+        
+        Button(master, text="Login", command=self.login).pack(pady=20)
 
     def login(self):
         username = self.username_var.get()
         password = self.password_var.get()
-
         with SessionLocal() as db:
             user = get_user_by_username(db, username)
             if user and verify_password(password, user.password):
-                messagebox.showinfo("Login Successful", f"Welcome, {user.username}!")
-            # Redirect to user-specific view based on role
-                if user.role == 'Administrador':
-                    self.master.destroy()  # Close login window
-                # Open admin view
-                    from src.gui.admin_view import AdminView
-                    admin_view = AdminView()
+                self.master.withdraw()  # Oculta la ventana principal
+                if user.role == 'Administrator':
+                    AdminView(self.master)
                 else:
-                    self.master.destroy()  # Close login window
-                # Open collaborator view
-                    from src.gui.collaborator_view import CollaboratorView
-                    collaborator_view = CollaboratorView()
+                    CollaboratorView(self.master, user.username)
             else:
                 messagebox.showerror("Login Failed", "Invalid username or password.")

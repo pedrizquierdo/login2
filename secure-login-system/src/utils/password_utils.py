@@ -1,8 +1,8 @@
 from bcrypt import hashpw, gensalt, checkpw
 
-def hash_password(password: str) -> bytes:
-    """Hash a password using bcrypt."""
-    return hashpw(password.encode('utf-8'), gensalt())
+def hash_password(password: str) -> str:
+    """Hash a password using bcrypt and return as string."""
+    return hashpw(password.encode('utf-8'), gensalt()).decode('utf-8')
 
 def verify_password(plain_password: str, hashed_password) -> bool:
     """Verify a hashed password against a plain password."""

@@ -3,8 +3,8 @@ from models.user import User
 from utils.password_utils import hash_password, verify_password
 
 def create_user(db: Session, username: str, email: str, password: str, role: str):
-    hashed_password = hash_password(password)
-    new_user = User(username=username, email=email, password=hashed_password, role=role)
+    
+    new_user = User(username=username, email=email, password=password, role=role)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -24,3 +24,11 @@ def validate_user(db: Session, username: str, password: str):
 
 def get_all_users(db: Session):
     return db.query(User).all()
+
+def delete_user_by_id(db: Session, user_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        db.delete(user)
+        db.commit()
+        return True
+    return False

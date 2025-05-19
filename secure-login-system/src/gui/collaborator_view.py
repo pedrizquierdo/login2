@@ -1,11 +1,17 @@
-from tkinter import Frame, Label, Button, messagebox
-from services.auth_service import AuthService
+from tkinter import Toplevel, Label, Button
 
-class CollaboratorView(Frame):
-    def __init__(self, master):
+class CollaboratorView(Toplevel):
+    def __init__(self, master, username):
         super().__init__(master)
-        self.master = master
-        self.init_ui()
+        self.title("Collaborator Menu")
+        self.geometry("300x200")
+        Label(self, text=f"Welcome, {username}!", font=("Arial", 14)).pack(pady=20)
+        Label(self, text="You are a Collaborator.", font=("Arial", 12)).pack(pady=10)
+        Button(self, text="Logout", command=self.logout).pack(pady=20)
+
+    def logout(self):
+        self.destroy()
+        self.master.deiconify()  # Muestra la ventana principal (login)
 
     def init_ui(self):
         self.master.title("Collaborator Dashboard")
@@ -19,12 +25,3 @@ class CollaboratorView(Frame):
 
         self.logout_button = Button(self, text="Logout", command=self.logout)
         self.logout_button.pack(pady=10)
-
-    def view_data(self):
-        # Placeholder for data viewing functionality
-        messagebox.showinfo("View Data", "Data viewing functionality is not implemented yet.")
-
-    def logout(self):
-        # Placeholder for logout functionality
-        messagebox.showinfo("Logout", "You have been logged out.")
-        self.master.destroy()  # Close the application or redirect to login window
