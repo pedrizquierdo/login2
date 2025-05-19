@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from models.user import User
 
 # Configuración de la conexión (ajusta según tu entorno)
-CONNECTION = 'mysql+pymysql://root:Admin@localhost/login'
+CONNECTION = 'mysql+pymysql://root:administrador@localhost/login'
 
 # Crear el motor de la base de datos
 engine = create_engine(CONNECTION, echo=True)

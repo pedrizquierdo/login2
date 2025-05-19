@@ -1,7 +1,8 @@
 from tkinter import Toplevel, Label, Button, StringVar, Entry, messagebox, Listbox, END
-from persistence.user_repository import create_user, get_all_users, delete_user_by_id
+from persistence.user_repository import change_password, create_user, get_all_users, delete_user_by_id, update_user
 from utils.password_utils import hash_password
 from persistence.base_datos import SessionLocal
+from models.user import User
 
 class AdminView(Toplevel):
     def __init__(self, master):
@@ -111,3 +112,82 @@ class RegisterUserWindow(Toplevel):
                 messagebox.showerror("Error", f"Registration failed: {e}")
     
     
+class EditUserWindow(Toplevel):
+    def __init__(self, master, user_id):
+        super().__init__(master)
+        self.user_id = user_id
+        self.title("Edit User")
+        self.geometry("350x300")
+        
+        with SessionLocal() as session:
+            user = session.query(User).filter(User.id == user_id).first()
+            
+        self.username_var = StringVar(value=user.username)
+        self.email_var = StringVar(value=user.email)
+        self.role_var = StringVar(value=user.role)
+        
+        Label(self, text="Username").pack()
+        Entry(self, textvariable=self.username_var).pack()
+        
+        Label(self, text="Email").pack()
+        Entry(self, textvariable=self.email_var).pack()
+        
+        Label(self, text="Role").pack()
+        Entry(self, textvariable=self.role_var).pack()
+        
+        Button(self, text="Save Changes", command=self.save_changes).pack(pady=10)
+        Button(self, text="Change Password", command=self.open_change_password).pack(pady=5)
+    
+    def save_changes(self):
+        with SessionLocal() as session:
+            if update_user(
+                session,
+                self.user_id,
+                self.username_var.get(),
+                self.email_var.get(),
+                self.role_var.get()
+            ):
+                messagebox.showinfo("Success", "User updated successfully")
+                self.destroy()
+            else:
+                messagebox.showerror("Error", "Failed to update user")
+    
+    def open_change_password(self):
+        ChangePasswordWindow(self, self.user_id)
+
+class ChangePasswordWindow(Toplevel):
+    def __init__(self, master, user_id):
+        super().__init__(master)
+        self.user_id = user_id
+        self.title("Change Password")
+        self.geometry("300x200")
+        
+        self.new_password_var = StringVar()
+        self.confirm_password_var = StringVar()
+        
+        Label(self, text="New Password").pack()
+        Entry(self, textvariable=self.new_password_var, show='*').pack()
+        
+        Label(self, text="Confirm Password").pack()
+        Entry(self, textvariable=self.confirm_password_var, show='*').pack()
+        
+        Button(self, text="Change Password", command=self.change_password).pack(pady=10)
+    
+    def change_password(self):
+        new_pass = self.new_password_var.get()
+        confirm_pass = self.confirm_password_var.get()
+        
+        if new_pass != confirm_pass:
+            messagebox.showerror("Error", "Passwords don't match")
+            return
+        
+        if len(new_pass) < 8:
+            messagebox.showerror("Error", "Password must be at least 8 characters")
+            return
+            
+        with SessionLocal() as session:
+            if change_password(session, self.user_id, new_pass):
+                messagebox.showinfo("Success", "Password changed successfully")
+                self.destroy()
+            else:
+                messagebox.showerror("Error", "Failed to change password")    

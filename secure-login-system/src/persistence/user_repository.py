@@ -32,3 +32,30 @@ def delete_user_by_id(db: Session, user_id: int):
         db.commit()
         return True
     return False
+
+
+def update_user(db: Session, user_id: int, username: str = None, email: str = None, role: str = None):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        return False
+    
+    if username:
+        user.username = username
+    if email:
+        user.email = email
+    if role:
+        user.role = role
+    
+    db.commit()
+    db.refresh(user)
+    return True
+
+def change_password(db: Session, user_id: int, new_password: str):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        return False
+    
+    hashed_password = hash_password(new_password)
+    user.password = hashed_password
+    db.commit()
+    return True
