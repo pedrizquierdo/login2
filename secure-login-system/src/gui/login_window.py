@@ -55,7 +55,7 @@ class LoginWindow(Frame):
                 if user.role == 'Administrator':
                     AdminView(self.master)
                 else:
-                    CollaboratorView(self.master, user.username)
+                    CollaboratorView(self.master, user.username, user.id)
             else:
                 self.attempts += 1
                 if self.attempts >= 5:

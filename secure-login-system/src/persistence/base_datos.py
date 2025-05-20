@@ -21,3 +21,5 @@ def get_db():
 def create_tables():
     # Crear todas las tablas en la base de datos
     User.metadata.create_all(bind=engine)
+
+    
